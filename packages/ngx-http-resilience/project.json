@@ -1,0 +1,47 @@
+{
+  "name": "ngx-http-resilience",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/ngx-http-resilience/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/ngx-http-resilience",
+        "main": "packages/ngx-http-resilience/src/index.ts",
+        "tsConfig": "packages/ngx-http-resilience/tsconfig.lib.json",
+        "assets": ["packages/ngx-http-resilience/*.md"]
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs ngx-http-resilience {args.ver} {args.tag}",
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "packages/ngx-http-resilience/**/*.ts",
+          "packages/ngx-http-resilience/package.json"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "packages/ngx-http-resilience/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    }
+  },
+  "tags": []
+}
