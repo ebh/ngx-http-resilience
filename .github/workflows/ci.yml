@@ -21,9 +21,9 @@ jobs:
       - name: Format Check
         run: npx nx format:check
       - name: Lint
-        run: npx nx affected -t lint --parallel=3
+        run: npx nx run-many -t lint --parallel=3
       - name: Test
-        run: npx nx affected -t test --parallel=3 --configuration=ci
+        run: npx nx run-many -t test --parallel=3 --configuration=ci
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
@@ -31,4 +31,4 @@ jobs:
         with:
           fail_ci_if_error: true
       - name: Build
-        run: npx nx affected -t build --parallel=3
+        run: npx nx run-many -t build --parallel=3
