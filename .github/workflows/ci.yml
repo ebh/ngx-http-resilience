@@ -24,5 +24,9 @@ jobs:
         run: npx nx affected -t lint --parallel=3
       - name: Test
         run: npx nx affected -t test --parallel=3 --configuration=ci
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Build
         run: npx nx affected -t build --parallel=3
