@@ -38,7 +38,8 @@
       "configurations": {
         "ci": {
           "ci": true,
-          "codeCoverage": true
+          "codeCoverage": true,
+          "coverageReporters": ["clover", "json", "lcov", "text"]
         }
       }
     }
