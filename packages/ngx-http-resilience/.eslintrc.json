@@ -8,6 +8,9 @@
     },
     {
       "files": ["*.ts", "*.tsx"],
+      "parserOptions": {
+        "project":["packages/ngx-http-resilience/tsconfig.*?.json"]
+      },
       "rules": {}
     },
     {
