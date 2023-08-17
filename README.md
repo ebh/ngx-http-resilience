@@ -1,4 +1,6 @@
-![CI Workflow](https://github.com/ebh/ngx-http-resilience/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/github/license/ebh/ngx-http-resilience)
+[![CI Workflow](https://github.com/ebh/ngx-http-resilience/actions/workflows/ci.yml/badge.svg)](https://github.com/ebh/ngx-http-resilience/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/ebh/ngx-http-resilience/graph/badge.svg?token=m6R2XL7nDP)](https://codecov.io/gh/ebh/ngx-http-resilience)
 
 # ngx-http-resilience
 
