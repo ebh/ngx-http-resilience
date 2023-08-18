@@ -2,31 +2,25 @@
   "name": "ngx-http-resilience",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/ngx-http-resilience/src",
+  "prefix": "ngx-http-resilience",
+  "tags": [],
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
-        "outputPath": "dist/packages/ngx-http-resilience",
-        "main": "packages/ngx-http-resilience/src/index.ts",
-        "tsConfig": "packages/ngx-http-resilience/tsconfig.lib.json",
-        "assets": ["packages/ngx-http-resilience/*.md"]
-      }
-    },
-    "publish": {
-      "command": "node tools/scripts/publish.mjs ngx-http-resilience {args.ver} {args.tag}",
-      "dependsOn": ["build"]
-    },
-    "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": [
-          "packages/ngx-http-resilience/**/*.ts",
-          "packages/ngx-http-resilience/package.json"
-        ]
-      }
+        "project": "packages/ngx-http-resilience/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "packages/ngx-http-resilience/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "packages/ngx-http-resilience/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
     },
     "test": {
       "executor": "@nx/jest:jest",
@@ -38,11 +32,20 @@
       "configurations": {
         "ci": {
           "ci": true,
-          "codeCoverage": true,
-          "coverageReporters": ["clover", "json", "lcov", "text"]
+          "codeCoverage": true
         }
       }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "packages/ngx-http-resilience/**/*.ts",
+          "packages/ngx-http-resilience/**/*.html",
+          "packages/ngx-http-resilience/package.json"
+        ]
+      }
     }
-  },
-  "tags": []
+  }
 }

@@ -1,1 +1,1 @@
-export * from './lib/ngx-http-resilience';
+export * from './lib/ngx-http-resilience.module';
