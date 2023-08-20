@@ -25,10 +25,10 @@ jobs:
         run: npx nx format:check
 
       - name: Lint
-        run: npx nx run-many -t lint --parallel=3
+        run: npm run lint
 
       - name: Test
-        run: npx nx run-many -t test --parallel=3 --configuration=ci
+        run: npm run test:ci
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
@@ -44,7 +44,7 @@ jobs:
           fail_ci_if_error: true
 
       - name: Build
-        run: npx nx run-many -t build --parallel=3
+        run: npm run build
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v3
