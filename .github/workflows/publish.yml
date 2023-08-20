@@ -16,10 +16,10 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npx nx run-many -t test --parallel=3 --configuration=ci
+        run: npm run test:ci
 
       - name: Build
-        run: npx nx run-many -t build --parallel=3
+        run: npm run build
 
       - uses: actions/setup-node@v3
         with:

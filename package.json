@@ -2,7 +2,11 @@
   "name": "@ngx-http-resilience/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build": "npx nx run-many -t build && cp README.md dist/packages/ngx-http-resilience",
+    "test": "npx nx run-many -t test --parallel=3",
+    "test:ci": "npm test -- --configuration=ci"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "~16.2.0",
