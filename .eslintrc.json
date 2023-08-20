@@ -1,10 +1,11 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nx", "rxjs", "json"],
+  "plugins": ["@nx", "rxjs", "json", "sonarjs"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "extends": ["plugin:sonarjs/recommended"],
       "rules": {
         "@nx/enforce-module-boundaries": [
           "error",
