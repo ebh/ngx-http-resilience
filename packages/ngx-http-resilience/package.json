@@ -1,6 +1,9 @@
 {
   "name": "ngx-http-resilience",
   "version": "0.0.1",
+  "description": "Angular HttpInterceptors that provide resiliency capabilities ",
+  "keywords": ["angular", "http", "interceptor", "resilience", "retry", "circuit-breaker"],
+  "license": "MIT",
   "peerDependencies": {
     "@angular/common": "^16.2.0",
     "@angular/core": "^16.2.0"
