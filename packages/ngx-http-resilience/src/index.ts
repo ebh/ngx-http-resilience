@@ -1,1 +1,1 @@
-export * from './lib/ngx-http-resilience.module';
+export * from './lib/visibility.interceptor';
