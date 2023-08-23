@@ -32,6 +32,7 @@
     "@angular/cli": "~16.2.0",
     "@angular/compiler-cli": "~16.2.0",
     "@angular/language-service": "~16.2.0",
+    "@faker-js/faker": "^8.0.2",
     "@nx/angular": "^16.7.1",
     "@nx/eslint-plugin": "16.7.0",
     "@nx/jest": "16.7.1",
