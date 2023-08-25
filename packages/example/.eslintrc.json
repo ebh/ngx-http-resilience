@@ -4,15 +4,12 @@
   "overrides": [
     {
       "files": ["*.ts"],
-      "parserOptions": {
-        "project": ["packages/example/tsconfig.*?.json"]
-      },
       "rules": {
         "@angular-eslint/directive-selector": [
           "error",
           {
             "type": "attribute",
-            "prefix": "ngxHttpResilience",
+            "prefix": "nhr",
             "style": "camelCase"
           }
         ],
@@ -20,7 +17,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "ngx-http-resilience",
+            "prefix": "nhr",
             "style": "kebab-case"
           }
         ]

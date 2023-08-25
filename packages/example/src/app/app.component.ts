@@ -4,8 +4,8 @@ import { NxWelcomeComponent } from './nx-welcome.component';
 @Component({
   standalone: true,
   imports: [NxWelcomeComponent],
-  selector: 'ngx-http-resilience-root',
-  template: `<ngx-http-resilience-nx-welcome></ngx-http-resilience-nx-welcome> `,
+  selector: 'nhr-root',
+  template: `<nhr-nx-welcome></nhr-nx-welcome> `,
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
