@@ -12,7 +12,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": "ngxHttpResilience",
+            "prefix": "nhr",
             "style": "camelCase"
           }
         ],
@@ -20,7 +20,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "ngx-http-resilience",
+            "prefix": "nhr",
             "style": "kebab-case"
           }
         ]
