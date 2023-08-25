@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
-  selector: 'nhr-nx-welcome',
+  selector: 'ngx-http-resilience-nx-welcome',
   standalone: true,
   imports: [CommonModule],
   template: `
