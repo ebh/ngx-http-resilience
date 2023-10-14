@@ -1,25 +1,25 @@
 {
-  "name": "example",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "example-apps-services",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "nhr",
-  "sourceRoot": "packages/example/src",
+  "sourceRoot": "packages/example/apps/services/src",
   "tags": [],
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/packages/example",
-        "index": "packages/example/src/index.html",
-        "main": "packages/example/src/main.ts",
+        "outputPath": "dist/packages/example/apps/services",
+        "index": "packages/example/apps/services/src/index.html",
+        "main": "packages/example/apps/services/src/main.ts",
         "polyfills": ["zone.js"],
-        "tsConfig": "packages/example/tsconfig.app.json",
+        "tsConfig": "packages/example/apps/services/tsconfig.app.json",
         "assets": [
-          "packages/example/src/favicon.ico",
-          "packages/example/src/assets"
+          "packages/example/apps/services/src/favicon.ico",
+          "packages/example/apps/services/src/assets"
         ],
-        "styles": ["packages/example/src/styles.css"],
+        "styles": ["packages/example/apps/services/src/styles.css"],
         "scripts": []
       },
       "configurations": {
@@ -51,12 +51,15 @@
     },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
+      "options": {
+        "port": 4201
+      },
       "configurations": {
         "production": {
-          "browserTarget": "example:build:production"
+          "browserTarget": "example-apps-services:build:production"
         },
         "development": {
-          "browserTarget": "example:build:development"
+          "browserTarget": "example-apps-services:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -64,7 +67,7 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "example:build"
+        "browserTarget": "example-apps-services:build"
       }
     },
     "lint": {
@@ -72,8 +75,8 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
-          "packages/example/**/*.ts",
-          "packages/example/**/*.html"
+          "packages/example/apps/services/**/*.ts",
+          "packages/example/apps/services/**/*.html"
         ]
       }
     },
@@ -81,7 +84,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "packages/example/jest.config.ts",
+        "jestConfig": "packages/example/apps/services/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {

@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@ngx-http-resilience/example/common": [
+        "packages/example/common/src/index.ts"
+      ],
       "ngx-http-resilience": ["packages/ngx-http-resilience/src/index.ts"]
     }
   },
