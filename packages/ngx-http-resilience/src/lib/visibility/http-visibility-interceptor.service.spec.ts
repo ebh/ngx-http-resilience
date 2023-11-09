@@ -2,6 +2,7 @@ import {
   HttpErrorResponse,
   HttpEvent,
   HttpEventType,
+  HttpHandler,
   HttpRequest,
   HttpResponse,
   HttpSentEvent,
@@ -9,23 +10,22 @@ import {
 import { faker } from '@faker-js/faker';
 import { Observable } from 'rxjs';
 import { TestScheduler } from 'rxjs/testing';
-import {
-  HttpVisibilityInterceptor,
-  createHttpVisibilityInterceptor,
-} from './visibility.interceptor';
+import * as td from 'testdouble';
+import { HttpVisibilityInterceptorService } from './http-visibility-interceptor.service';
 
 let testScheduler: TestScheduler;
-let interceptor: HttpVisibilityInterceptor;
+let service: HttpVisibilityInterceptorService;
+const next = td.object<HttpHandler>();
 
 beforeEach(() => {
+  service = new HttpVisibilityInterceptorService();
+
   testScheduler = new TestScheduler((actual, expected) => {
     expect(actual).toEqual(expected);
   });
-
-  interceptor = createHttpVisibilityInterceptor();
 });
 
-it('should return & report http events', () => {
+it('should return source & report http events', () => {
   testScheduler.run(({ cold, expectObservable }) => {
     const sentEvent: HttpSentEvent = { type: HttpEventType.Sent };
     const response = new HttpResponse<string>({ body: 'response' });
@@ -40,20 +40,20 @@ it('should return & report http events', () => {
       faker.internet.url(),
       faker.string.sample()
     );
-    const result$ = interceptor.intercept(req, {
-      handle: jest.fn().mockReturnValue(source$),
-    });
+    td.when(next.handle(req)).thenReturn(source$);
+
+    const result$ = service.intercept(req, next);
 
     expectObservable(result$).toEqual(source$);
 
-    expectObservable(interceptor.httpEvents$).toBe('-a-b', {
-      a: { event: sentEvent, req: req },
-      b: { event: response, req: req },
+    expectObservable(service.observeHttpEvents()).toBe('-a-b', {
+      a: { event: sentEvent, req: req, duration: expect.any(Number) },
+      b: { event: response, req: req, duration: expect.any(Number) },
     });
   });
 });
 
-it('should return & report error responses', () => {
+it('should return source & report error responseStatuses', () => {
   testScheduler.run(({ cold, expectObservable }) => {
     const sentEvent: HttpSentEvent = { type: HttpEventType.Sent };
     const errorResponse = new HttpErrorResponse({
@@ -71,18 +71,17 @@ it('should return & report error responses', () => {
       faker.internet.url(),
       faker.string.sample()
     );
-    const result$ = interceptor.intercept(req, {
-      handle: jest.fn().mockReturnValue(source$),
-    });
+    td.when(next.handle(req)).thenReturn(source$);
+    const result$ = service.intercept(req, next);
 
     expectObservable(result$).toEqual(source$);
-    expectObservable(interceptor.errors$).toBe('---a', {
-      a: { err: errorResponse, req },
+    expectObservable(service.observeErrors()).toBe('---a', {
+      a: { err: errorResponse, req, duration: expect.any(Number) },
     });
   });
 });
 
-it('should report merged https events from multiple simultaneous requests', () => {
+it('should return sources & report merged https events from multiple simultaneous requests', () => {
   testScheduler.run(({ cold, expectObservable }) => {
     const sentEvent1: HttpSentEvent = { type: HttpEventType.Sent };
     const sentEvent2: HttpSentEvent = { type: HttpEventType.Sent };
@@ -104,32 +103,30 @@ it('should report merged https events from multiple simultaneous requests', () =
       faker.internet.url(),
       'req1'
     );
-    const result1$ = interceptor.intercept(req1, {
-      handle: jest.fn().mockReturnValue(source1$),
-    });
+    td.when(next.handle(req1)).thenReturn(source1$);
+    const result1$ = service.intercept(req1, next);
 
     const req2 = new HttpRequest<string>(
       faker.internet.httpMethod(),
       faker.internet.url(),
       'req2'
     );
-    const result2$ = interceptor.intercept(req2, {
-      handle: jest.fn().mockReturnValue(source2$),
-    });
+    td.when(next.handle(req2)).thenReturn(source2$);
+    const result2$ = service.intercept(req2, next);
 
     expectObservable(result1$).toEqual(source1$);
     expectObservable(result2$).toEqual(source2$);
 
-    expectObservable(interceptor.httpEvents$).toBe('-a-b-d-c', {
-      a: { event: sentEvent1, req: req1 },
-      b: { event: sentEvent2, req: req2 },
-      c: { event: response1, req: req1 },
-      d: { event: response2, req: req2 },
+    expectObservable(service.observeHttpEvents()).toBe('-a-b-d-c', {
+      a: { event: sentEvent1, req: req1, duration: expect.any(Number) },
+      b: { event: sentEvent2, req: req2, duration: expect.any(Number) },
+      c: { event: response1, req: req1, duration: expect.any(Number) },
+      d: { event: response2, req: req2, duration: expect.any(Number) },
     });
   });
 });
 
-it('should report merged error responses from multiple simultaneous requests', () => {
+it('should return sources & report merged error responseStatuses from multiple simultaneous requests', () => {
   testScheduler.run(({ cold, expectObservable }) => {
     const sentEvent1: HttpSentEvent = { type: HttpEventType.Sent };
     const sentEvent2: HttpSentEvent = { type: HttpEventType.Sent };
@@ -155,25 +152,23 @@ it('should report merged error responses from multiple simultaneous requests', (
       faker.internet.url(),
       'req1'
     );
-    const result1$ = interceptor.intercept(req1, {
-      handle: jest.fn().mockReturnValue(source1$),
-    });
+    td.when(next.handle(req1)).thenReturn(source1$);
+    const result1$ = service.intercept(req1, next);
 
     const req2 = new HttpRequest<string>(
       faker.internet.httpMethod(),
       faker.internet.url(),
       'req2'
     );
-    const result2$ = interceptor.intercept(req2, {
-      handle: jest.fn().mockReturnValue(source2$),
-    });
+    td.when(next.handle(req2)).thenReturn(source2$);
+    const result2$ = service.intercept(req2, next);
 
     expectObservable(result1$).toEqual(source1$);
     expectObservable(result2$).toEqual(source2$);
 
-    expectObservable(interceptor.errors$).toBe('-----(ab)', {
-      a: { err: errorResponse, req: req1 },
-      b: { err: error, req: req2 },
+    expectObservable(service.observeErrors()).toBe('-----(ab)', {
+      a: { err: errorResponse, req: req1, duration: expect.any(Number) },
+      b: { err: error, req: req2, duration: expect.any(Number) },
     });
   });
 });

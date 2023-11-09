@@ -1,1 +1,1 @@
-export * from './lib/visibility.interceptor';
+export * from './lib/visibility';
