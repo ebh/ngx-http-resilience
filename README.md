@@ -74,6 +74,7 @@ export const appConfig: ApplicationConfig = {
 The visibility interceptor provides a stream of http events and errors. This can be used to modify an apps behaviour, such as letting a user know that there are network connectivity issues.
 
 ```typescript
+
 ```
 
 ### Retry
@@ -92,6 +93,5 @@ Optionally it can also specify a:
 - Maximum time to wait for success (`maxDuration`)
 
 | Function                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Service |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
 | <pre><br/>provideHttpClient(<br/>&nbsp;&nbsp;withInterceptors([<br/>&nbsp;&nbsp;&nbsp;&nbsp;createHttpRetryInterceptorFn({<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shouldHandleRequest: matchPattern({ url: /example.com/ }),<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shouldHandleError: withStatusCodes(STANDARD_RETRYABLE_STATUS_CODES),<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;delay: constantDelay(10, true),<br/>&nbsp;&nbsp;&nbsp;&nbsp;})<br/>&nbsp;&nbsp;])<br/>),</pre> | TODO    |
-
