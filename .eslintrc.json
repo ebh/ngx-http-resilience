@@ -36,10 +36,13 @@
             ]
           }
         ],
-        "sonarjs/no-duplicate-string": ["error", {
-          "minimumLength": 3,
-          "ignoredCharacterRegex": "^should "
-        }]
+        "sonarjs/no-duplicate-string": [
+          "error",
+          {
+            "minimumLength": 3,
+            "ignoredCharacterRegex": "^should "
+          }
+        ]
       }
     },
     {

@@ -20,7 +20,6 @@
   },
   "sideEffects": false,
   "devDependencies": {
-    "@faker-js/faker": "^8.0.2",
-    "testdouble": "^3.20.0"
+    "@faker-js/faker": "^8.0.2"
   }
 }
