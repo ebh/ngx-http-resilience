@@ -34,12 +34,12 @@ export type StatusCodesErrorPredicateOptions =
 /**
  * Set of status codes that are generally safe to retry by default.
  */
-export const standardRetryableStatusCodes = [
+export const STANDARD_RETRYABLE_STATUS_CODES = [
   HttpStatusCode.RequestTimeout,
   HttpStatusCode.BadGateway,
   HttpStatusCode.ServiceUnavailable,
   HttpStatusCode.GatewayTimeout,
-] as const;
+]; // TODO make const
 
 /**
  * Match any error with a status code matching the given options.
