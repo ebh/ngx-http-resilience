@@ -9,11 +9,16 @@ import {
   HttpSentEvent,
 } from '@angular/common/http';
 import { faker } from '@faker-js/faker';
-import { Observable } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { TestScheduler } from 'rxjs/testing';
 import * as td from 'testdouble';
-import { createHttpRetryInterceptorFn } from './http-retry-interceptor.fn';
-import { DelayFn, ErrorPredicate, RequestPredicate } from './types';
+import { createHttpRetryInterceptorFn } from '.';
+import {
+  DelayFn,
+  ErrorPredicate,
+  RequestPredicate,
+  RetryInterceptorEvent,
+} from './types';
 
 let req: HttpRequest<unknown>;
 let sentEvent: HttpSentEvent;
@@ -227,6 +232,117 @@ describe('createHttpRetryInterceptorFn', () => {
       });
     });
   });
+
+  describe('when events$ is provided', () => {
+    it('should emit RetryInterceptorRequestIgnoredEvent when shouldHandleRequest returns false', () => {
+      testScheduler.run(({ cold, expectObservable }) => {
+        const source$: Observable<HttpEvent<unknown>> = cold('-s-r|', {
+          s: sentEvent,
+          r: response,
+        });
+
+        td.when(shouldHandleRequest(req)).thenReturn(false);
+        td.when(next(req)).thenReturn(source$);
+
+        const events$ = new ReplaySubject<RetryInterceptorEvent>(100);
+
+        interceptorFn = createHttpRetryInterceptorFn(
+          {
+            shouldHandleRequest,
+            shouldHandleError,
+            delay,
+          },
+          { events$ }
+        );
+
+        const result$ = interceptorFn(req, next);
+
+        expectObservable(result$).toBe('-s-r|', {
+          s: sentEvent,
+          r: response,
+        });
+
+        expectObservable(events$).toBe('e', {
+          e: { req, type: 'Ignored' },
+        });
+      });
+    });
+
+    it('should emit RetryInterceptorRequestFailedEvent when shouldHandleError returns false', () => {
+      testScheduler.run(({ cold, expectObservable }) => {
+        const failedSource$: Observable<HttpEvent<unknown>> = cold(
+          '-s-#',
+          { s: sentEvent },
+          err
+        );
+
+        td.when(shouldHandleRequest(req)).thenReturn(true);
+        td.when(shouldHandleError(err)).thenReturn(false);
+        td.when(next(req)).thenReturn(failedSource$);
+
+        const events$ = new ReplaySubject<RetryInterceptorEvent>(100);
+
+        interceptorFn = createHttpRetryInterceptorFn(
+          {
+            shouldHandleRequest,
+            shouldHandleError,
+            delay,
+          },
+          { events$ }
+        );
+
+        const result$ = interceptorFn(req, next);
+
+        expectObservable(result$).toBe('-s-#', { s: sentEvent }, err);
+
+        expectObservable(events$).toBe('---e', {
+          e: { req, type: 'Failed', error: err, attempt: 1 },
+        });
+      });
+    });
+  });
+
+  describe('when maxTotalDelay is provided', () => {
+    let maxTotalDelay: number;
+    beforeEach(() => {
+      maxTotalDelay = faker.number.int({ min: 50, max: 150 });
+
+      interceptorFn = createHttpRetryInterceptorFn({
+        shouldHandleRequest,
+        shouldHandleError,
+        delay,
+        maxTotalDelay,
+      });
+    });
+
+    it('should not retry when total delay exceeds maxTotalDelay', () => {
+      td.when(shouldHandleRequest(td.matchers.anything())).thenReturn(true);
+      td.when(shouldHandleError(td.matchers.anything())).thenReturn(true);
+
+      td.when(
+        delay({ attempt: 1, startTime: td.matchers.anything() })
+      ).thenReturn(maxTotalDelay + 1000);
+
+      testScheduler.run(({ cold, expectObservable }) => {
+        const source$: Observable<HttpEvent<unknown>> = cold(
+          `-s- ${maxTotalDelay}ms ------r`,
+          { s: sentEvent, r: response }
+        );
+
+        td.when(next(req)).thenReturn(source$);
+
+        const result$ = interceptorFn(req, next);
+
+        expectObservable(result$).toBe(
+          `-s-- ${maxTotalDelay - 3}ms #`,
+          {
+            s: sentEvent,
+          },
+          new Error('Max total delay exceeded')
+        );
+      });
+    });
+  });
 });
 
 describe('validateRetryStrategy', () => {
@@ -238,7 +354,7 @@ describe('validateRetryStrategy', () => {
         delay: () => 0,
         maxRetryAttempts: -1,
       })
-    ).toThrowError();
+    ).toThrow();
   });
 
   it('should throw error when maxTotalDelay is negative number', () => {
@@ -249,6 +365,6 @@ describe('validateRetryStrategy', () => {
         delay: () => 0,
         maxTotalDelay: -1,
       })
-    ).toThrowError();
+    ).toThrow();
   });
 });

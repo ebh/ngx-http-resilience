@@ -68,7 +68,7 @@ describe('patternMatch', () => {
   });
 
   describe('when method & url pattern', () => {
-    it('should return false when neither mathch', () => {
+    it('should return false when neither match', () => {
       const predicate = matchPattern({
         method: 'GET',
         url: 'abc',

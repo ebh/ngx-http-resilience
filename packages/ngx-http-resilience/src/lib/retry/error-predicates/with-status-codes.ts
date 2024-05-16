@@ -39,7 +39,7 @@ export const STANDARD_RETRYABLE_STATUS_CODES = [
   HttpStatusCode.BadGateway,
   HttpStatusCode.ServiceUnavailable,
   HttpStatusCode.GatewayTimeout,
-]; // TODO make const
+] as const; // TODO make const
 
 /**
  * Match any error with a status code matching the given options.
