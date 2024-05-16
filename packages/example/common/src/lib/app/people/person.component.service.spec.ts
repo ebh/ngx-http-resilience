@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { faker } from '@faker-js/faker';
-import { ColdObservable } from 'rxjs/internal/testing/ColdObservable';
+import { Observable } from 'rxjs';
 import { TestScheduler } from 'rxjs/testing';
 import * as td from 'testdouble';
 import { PeopleService } from '../../services/people.service';
@@ -81,10 +81,10 @@ describe('PersonComponentService', () => {
         const personF = createMockPerson();
 
         const respA$ = cold('p', { p: personA });
-        const respB$: ColdObservable<Person> = cold('---#', {}, errorB);
+        const respB$: Observable<Person> = cold('---#', {}, errorB);
         const respC$ = cold('p', { p: personC });
         const respD$ = cold('p', { p: personD });
-        const respE$: ColdObservable<Person> = cold('---#', {}, errorE);
+        const respE$: Observable<Person> = cold('---#', {}, errorE);
         const respF$ = cold('p', { p: personF });
 
         td.when(peopleService.observePerson(id)).thenReturn(
