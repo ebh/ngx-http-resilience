@@ -20,18 +20,12 @@ npm install ngx-http-resilience
 
 ```typescript
 // app.config.ts
-import {provideHttpClient, withInterceptors} from '@angular/common/http';
-import {ApplicationConfig} from '@angular/core';
-import {
-  HttpVisibilityInterceptorError,
-  HttpVisibilityInterceptorHttpEvent,
-  createHttpVisibilityInterceptorFn,
-} from 'ngx-http-resilience';
-import {Subject} from 'rxjs';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { ApplicationConfig } from '@angular/core';
+import { HttpVisibilityInterceptorError, HttpVisibilityInterceptorHttpEvent, createHttpVisibilityInterceptorFn } from 'ngx-http-resilience';
+import { Subject } from 'rxjs';
 
-export const httpEvents$ = new Subject<
-  HttpVisibilityInterceptorHttpEvent<unknown>
->();
+export const httpEvents$ = new Subject<HttpVisibilityInterceptorHttpEvent<unknown>>();
 export const errors$ = new Subject<HttpVisibilityInterceptorError>();
 const visibilityInterceptor = createHttpVisibilityInterceptorFn({
   httpEvents$,
@@ -47,12 +41,11 @@ export const appConfig: ApplicationConfig = {
 
 ```typescript
 // app.config.ts
-import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import {ApplicationConfig} from '@angular/core';
-import {HttpVisibilityInterceptorService} from 'ngx-http-resilience';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ApplicationConfig } from '@angular/core';
+import { HttpVisibilityInterceptorService } from 'ngx-http-resilience';
 
-export const visibilityInterceptorService =
-  new HttpVisibilityInterceptorService();
+export const visibilityInterceptorService = new HttpVisibilityInterceptorService();
 
 export const httpInterceptorProviders = [
   {
