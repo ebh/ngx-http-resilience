@@ -7,7 +7,8 @@
     "test": "npx nx run-many -t test --parallel=3",
     "test:ci": "npm test -- --configuration=ci",
     "test:component": "npx nx run-many -t component-test --",
-    "lint": "npx nx run-many -t lint --parallel=3"
+    "lint": "npx nx run-many -t lint --parallel=3",
+    "format:check": "npx nx run-many -t format-check --parallel=3"
   },
   "private": true,
   "dependencies": {
