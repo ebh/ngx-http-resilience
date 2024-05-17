@@ -58,6 +58,9 @@ export type RetryInterceptorEvent =
   | RetryInterceptorRequestSucceededEvent;
 
 export interface RetryInterceptorOptions {
+  /**
+   * An optional Subject for emitting retry events
+   */
   events$?: Subject<RetryInterceptorEvent>;
 }
 

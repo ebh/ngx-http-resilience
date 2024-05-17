@@ -12,6 +12,7 @@ import {
  * strategy.
  *
  * @param policy The retry strategy to use
+ * @param options Additional options for the interceptor
  *
  * @example
  *  createHttpRetryInterceptorFn({
