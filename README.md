@@ -19,8 +19,7 @@ npm install ngx-http-resilience
 ### Interceptor Functions
 
 ```typescript
-#
-app.config.ts
+// app.config.ts
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {ApplicationConfig} from '@angular/core';
 import {
@@ -47,8 +46,7 @@ export const appConfig: ApplicationConfig = {
 ### Interceptor Service
 
 ```typescript
-#
-app.config.ts
+// app.config.ts
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {ApplicationConfig} from '@angular/core';
 import {HttpVisibilityInterceptorService} from 'ngx-http-resilience';
