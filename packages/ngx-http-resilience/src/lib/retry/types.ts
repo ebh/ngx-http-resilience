@@ -21,10 +21,19 @@ export interface RetryPolicy {
   maxTotalDelay?: number;
 }
 
-export type RetryInterceptorRequestType = 'Ignored' | 'Failed' | 'Succeeded';
+export type RetryInterceptorRequestType =
+  | 'Ignored'
+  | 'UnhandledError'
+  | 'FailedTryingAgain'
+  | 'FailedMaxAttemptsExceeded'
+  | 'MaxDelayExceeded'
+  | 'Succeeded';
 export const RetryInterceptorRequestTypes = {
   Ignored: 'Ignored',
-  Failed: 'Failed',
+  UnhandledError: 'UnhandledError',
+  FailedTryingAgain: 'FailedTryingAgain',
+  FailedMaxAttemptsExceeded: 'FailedMaxAttemptsExceeded',
+  MaxDelayExceeded: 'MaxDelayExceeded',
   Succeeded: 'Succeeded',
 } as const satisfies { [key in RetryInterceptorRequestType]: key };
 
@@ -38,11 +47,31 @@ export interface RetryInterceptorRequestIgnoredEvent
   type: 'Ignored';
 }
 
-export interface RetryInterceptorRequestFailedEvent
+export interface RetryInterceptorUnhandledErrorEvent
   extends BaseRetryInterceptorRequest {
-  type: 'Failed';
+  type: 'UnhandledError';
   error: unknown;
   attempt: number;
+}
+
+export interface RetryInterceptorRequestFailedTryingAgainEvent
+  extends BaseRetryInterceptorRequest {
+  type: 'FailedTryingAgain';
+  error: unknown;
+  attempt: number;
+}
+
+export interface RetryInterceptorRequestFailedMaxAttemptsExceededEvent
+  extends BaseRetryInterceptorRequest {
+  type: 'FailedMaxAttemptsExceeded';
+  error: unknown;
+  attempt: number;
+}
+
+export interface RetryInterceptorRequestMaxDelayExceededEvent
+  extends BaseRetryInterceptorRequest {
+  type: 'MaxDelayExceeded';
+  // attempt: number; -- TODO: Add attempt number to this event
 }
 
 export interface RetryInterceptorRequestSucceededEvent
@@ -54,7 +83,10 @@ export interface RetryInterceptorRequestSucceededEvent
 
 export type RetryInterceptorEvent =
   | RetryInterceptorRequestIgnoredEvent
-  | RetryInterceptorRequestFailedEvent
+  | RetryInterceptorUnhandledErrorEvent
+  | RetryInterceptorRequestFailedTryingAgainEvent
+  | RetryInterceptorRequestFailedMaxAttemptsExceededEvent
+  | RetryInterceptorRequestMaxDelayExceededEvent
   | RetryInterceptorRequestSucceededEvent;
 
 export interface RetryInterceptorOptions {

@@ -32,6 +32,12 @@ export function retryRequestWithStrategy(
           strategy.maxRetryAttempts &&
           state.attempt > strategy.maxRetryAttempts
         ) {
+          events$.next({
+            type: 'FailedMaxAttemptsExceeded',
+            req,
+            error: err,
+            attempt: state.attempt,
+          });
           throw err;
         }
 
@@ -72,8 +78,10 @@ function sendFailedEvents(
   state: RetryState,
   events$: Subject<RetryInterceptorEvent>
 ) {
+  // TODO: Don't emit when maxRetryAttempts is exceeded
+
   events$.next({
-    type: 'Failed',
+    type: 'FailedTryingAgain',
     req,
     error: err,
     attempt: state.attempt + 1,

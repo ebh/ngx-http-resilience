@@ -296,7 +296,7 @@ describe('createHttpRetryInterceptorFn', () => {
         expectObservable(result$).toBe('-s-#', { s: sentEvent }, err);
 
         expectObservable(events$).toBe('---e', {
-          e: { req, type: 'Failed', error: err, attempt: 1 },
+          e: { req, type: 'FailedTryingAgain', error: err, attempt: 1 },
         });
       });
     });

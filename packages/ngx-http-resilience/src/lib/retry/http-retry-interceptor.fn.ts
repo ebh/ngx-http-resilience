@@ -43,7 +43,15 @@ export function createHttpRetryInterceptorFn(
       ? retryRequest$.pipe(
           timeout({
             each: policy.maxTotalDelay,
-            with: () => throwError(() => new Error('Max total delay exceeded')),
+            with: () =>
+              throwError(() => {
+                events$.next({
+                  type: 'MaxDelayExceeded',
+                  req,
+                });
+
+                return new Error('Max total delay exceeded');
+              }),
           })
         )
       : retryRequest$;
