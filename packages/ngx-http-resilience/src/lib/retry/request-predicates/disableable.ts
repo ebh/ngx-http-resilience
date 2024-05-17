@@ -19,7 +19,7 @@ export interface DisableablePredicate {
 /**
  * Wraps a request predicate and allows it to be disabled
  * @param predicate The predicate to wrap
- * @param initialDisabledState The initial disabled state of the predicate, defaults to false
+ * @param initiallyDisabled The initial disabled state of the predicate, defaults to false (enabled)
  *
  * @example
  * const disableablePredicate = createDisableablePredicate(matchPattern({method: 'GET' }));
@@ -30,9 +30,9 @@ export interface DisableablePredicate {
  */
 export function createDisableablePredicate(
   predicate: RequestPredicate,
-  initialDisabledState = false
+  initiallyDisabled = false
 ): DisableablePredicate {
-  const disabled$ = new BehaviorSubject<boolean>(initialDisabledState);
+  const disabled$ = new BehaviorSubject<boolean>(initiallyDisabled);
 
   return {
     requestPredicate: (req) => !disabled$.value && predicate(req),
