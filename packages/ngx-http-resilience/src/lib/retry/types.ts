@@ -22,14 +22,14 @@ export interface RetryPolicy {
 }
 
 export type RetryInterceptorRequestType =
-  | 'Ignored'
+  | 'IgnoredRequest'
   | 'UnhandledError'
   | 'FailedTryingAgain'
   | 'FailedMaxAttemptsExceeded'
   | 'MaxDelayExceeded'
   | 'Succeeded';
 export const RetryInterceptorRequestTypes = {
-  Ignored: 'Ignored',
+  IgnoredRequest: 'IgnoredRequest',
   UnhandledError: 'UnhandledError',
   FailedTryingAgain: 'FailedTryingAgain',
   FailedMaxAttemptsExceeded: 'FailedMaxAttemptsExceeded',
@@ -44,7 +44,7 @@ interface BaseRetryInterceptorRequest {
 
 export interface RetryInterceptorRequestIgnoredEvent
   extends BaseRetryInterceptorRequest {
-  type: 'Ignored';
+  type: 'IgnoredRequest';
 }
 
 export interface RetryInterceptorUnhandledErrorEvent

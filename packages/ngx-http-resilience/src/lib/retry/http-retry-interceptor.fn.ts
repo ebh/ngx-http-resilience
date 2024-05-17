@@ -31,7 +31,7 @@ export function createHttpRetryInterceptorFn(
   return (req, next) => {
     if (!policy.shouldHandleRequest(req)) {
       if (options.events$) {
-        options.events$.next({ type: 'Ignored', req });
+        options.events$.next({ type: 'IgnoredRequest', req });
       }
 
       return next(req);

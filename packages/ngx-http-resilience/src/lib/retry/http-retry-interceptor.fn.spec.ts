@@ -263,7 +263,7 @@ describe('createHttpRetryInterceptorFn', () => {
         });
 
         expectObservable(events$).toBe('e', {
-          e: { req, type: 'Ignored' },
+          e: { req, type: 'IgnoredRequest' },
         });
       });
     });
