@@ -263,12 +263,12 @@ describe('createHttpRetryInterceptorFn', () => {
         });
 
         expectObservable(events$).toBe('e', {
-          e: { req, type: 'IgnoredRequest' },
+          e: { req, type: 'RequestIgnored' },
         });
       });
     });
 
-    it('should emit RetryInterceptorRequestFailedEvent when shouldHandleError returns false', () => {
+    it('should emit error when shouldHandleError returns false', () => {
       testScheduler.run(({ cold, expectObservable }) => {
         const failedSource$: Observable<HttpEvent<unknown>> = cold(
           '-s-#',
@@ -296,7 +296,7 @@ describe('createHttpRetryInterceptorFn', () => {
         expectObservable(result$).toBe('-s-#', { s: sentEvent }, err);
 
         expectObservable(events$).toBe('---e', {
-          e: { req, type: 'FailedTryingAgain', error: err, attempt: 1 },
+          e: { req, type: 'UnhandledError', err, attempt: 1 },
         });
       });
     });
@@ -304,15 +304,22 @@ describe('createHttpRetryInterceptorFn', () => {
 
   describe('when maxTotalDelay is provided', () => {
     let maxTotalDelay: number;
+    let events$: ReplaySubject<RetryInterceptorEvent>;
+
     beforeEach(() => {
       maxTotalDelay = faker.number.int({ min: 50, max: 150 });
 
-      interceptorFn = createHttpRetryInterceptorFn({
-        shouldHandleRequest,
-        shouldHandleError,
-        delay,
-        maxTotalDelay,
-      });
+      events$ = new ReplaySubject<RetryInterceptorEvent>(100);
+
+      interceptorFn = createHttpRetryInterceptorFn(
+        {
+          shouldHandleRequest,
+          shouldHandleError,
+          delay,
+          maxTotalDelay,
+        },
+        { events$ }
+      );
     });
 
     it('should not retry when total delay exceeds maxTotalDelay', () => {
@@ -340,6 +347,10 @@ describe('createHttpRetryInterceptorFn', () => {
           },
           new Error('Max total delay exceeded')
         );
+
+        expectObservable(events$).toBe(`${maxTotalDelay}ms -e`, {
+          e: { req, type: 'MaxDelayExceeded', attempt: 1 },
+        });
       });
     });
   });

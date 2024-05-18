@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { Subject, throwError, timeout } from 'rxjs';
-import { retryRequestWithStrategy } from './internal';
+import { createRetryState, retryRequestWithStrategy } from './internal';
 import {
   RetryInterceptorEvent,
   RetryInterceptorOptions,
@@ -31,13 +31,21 @@ export function createHttpRetryInterceptorFn(
   return (req, next) => {
     if (!policy.shouldHandleRequest(req)) {
       if (options.events$) {
-        options.events$.next({ type: 'IgnoredRequest', req });
+        options.events$.next({ type: 'RequestIgnored', req });
       }
 
       return next(req);
     }
 
-    const retryRequest$ = retryRequestWithStrategy(req, next, policy, events$);
+    const state = createRetryState();
+
+    const retryRequest$ = retryRequestWithStrategy(
+      req,
+      next,
+      policy,
+      state,
+      events$
+    );
 
     return policy.maxTotalDelay
       ? retryRequest$.pipe(
@@ -48,6 +56,7 @@ export function createHttpRetryInterceptorFn(
                 events$.next({
                   type: 'MaxDelayExceeded',
                   req,
+                  attempt: state.attempt + 1,
                 });
 
                 return new Error('Max total delay exceeded');

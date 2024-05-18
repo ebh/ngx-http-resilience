@@ -22,14 +22,14 @@ export interface RetryPolicy {
 }
 
 export type RetryInterceptorRequestType =
-  | 'IgnoredRequest'
+  | 'RequestIgnored'
   | 'UnhandledError'
   | 'FailedTryingAgain'
   | 'FailedMaxAttemptsExceeded'
   | 'MaxDelayExceeded'
   | 'Succeeded';
 export const RetryInterceptorRequestTypes = {
-  IgnoredRequest: 'IgnoredRequest',
+  RequestIgnored: 'RequestIgnored',
   UnhandledError: 'UnhandledError',
   FailedTryingAgain: 'FailedTryingAgain',
   FailedMaxAttemptsExceeded: 'FailedMaxAttemptsExceeded',
@@ -44,34 +44,34 @@ interface BaseRetryInterceptorRequest {
 
 export interface RetryInterceptorRequestIgnoredEvent
   extends BaseRetryInterceptorRequest {
-  type: 'IgnoredRequest';
+  type: 'RequestIgnored';
 }
 
 export interface RetryInterceptorUnhandledErrorEvent
   extends BaseRetryInterceptorRequest {
   type: 'UnhandledError';
-  error: unknown;
+  err: unknown;
   attempt: number;
 }
 
 export interface RetryInterceptorRequestFailedTryingAgainEvent
   extends BaseRetryInterceptorRequest {
   type: 'FailedTryingAgain';
-  error: unknown;
+  err: unknown;
   attempt: number;
 }
 
 export interface RetryInterceptorRequestFailedMaxAttemptsExceededEvent
   extends BaseRetryInterceptorRequest {
   type: 'FailedMaxAttemptsExceeded';
-  error: unknown;
+  err: unknown;
   attempt: number;
 }
 
 export interface RetryInterceptorRequestMaxDelayExceededEvent
   extends BaseRetryInterceptorRequest {
   type: 'MaxDelayExceeded';
-  // attempt: number; -- TODO: Add attempt number to this event
+  attempt: number;
 }
 
 export interface RetryInterceptorRequestSucceededEvent

@@ -17,6 +17,8 @@ import {
   RetryInterceptorEvent,
 } from '../types';
 import { retryRequestWithStrategy } from './retry-request-with-strategy';
+import { createRetryState } from './retry-state';
+import { RetryState } from './types';
 
 let req: HttpRequest<unknown>;
 let sentEvent: HttpSentEvent;
@@ -30,11 +32,15 @@ let shouldHandleRequest: RequestPredicate;
 let shouldHandleError: ErrorPredicate;
 let delay: DelayFn;
 
+let state: RetryState;
+
 beforeEach(() => {
   next = td.func<HttpHandlerFn>();
   shouldHandleRequest = td.func<RequestPredicate>();
   shouldHandleError = td.func<ErrorPredicate>();
   delay = td.func<DelayFn>();
+
+  state = createRetryState();
 
   req = new HttpRequest<string>(
     faker.internet.httpMethod(),
@@ -78,6 +84,7 @@ describe('retryRequestWithStrategy', () => {
           maxRetryAttempts: faker.helpers.maybe(() => faker.number.int()),
           maxTotalDelay: faker.helpers.maybe(() => faker.number.int()),
         },
+        state,
         events$
       );
 
@@ -92,7 +99,7 @@ describe('retryRequestWithStrategy', () => {
     });
   });
 
-  it.skip('should return error and subscribe only once when unhandled error occurs', () => {
+  it('should return error and subscribe only once when unhandled error occurs', () => {
     td.when(shouldHandleError(err)).thenReturn(false);
 
     testScheduler.run(({ cold, expectObservable, expectSubscriptions }) => {
@@ -120,7 +127,8 @@ describe('retryRequestWithStrategy', () => {
           maxRetryAttempts: faker.helpers.maybe(() => faker.number.int()),
           maxTotalDelay: faker.helpers.maybe(() => faker.number.int()),
         },
-        new Subject<RetryInterceptorEvent>()
+        state,
+        events$
       );
 
       expectObservable(result$).toBe(
@@ -132,7 +140,7 @@ describe('retryRequestWithStrategy', () => {
       );
       expectSubscriptions(source$.subscriptions).toBe(sub);
       expectObservable(events$).toBe('---(e)', {
-        e: { type: 'Failed', req, res: response, attempt: 1 },
+        e: { type: 'UnhandledError', req, err, attempt: 1 },
       });
     });
   });
@@ -173,6 +181,7 @@ describe('retryRequestWithStrategy', () => {
           maxRetryAttempts: faker.helpers.maybe(() => faker.number.int()),
           maxTotalDelay: faker.helpers.maybe(() => faker.number.int()),
         },
+        state,
         events$
       );
 
@@ -185,9 +194,15 @@ describe('retryRequestWithStrategy', () => {
         `${delayValue}ms ---^---!`
       );
 
-      // FIXME: Why are there two events?
-      expectObservable(events$).toBe(`----- ${delayValue}ms -(ee)`, {
-        e: {
+      expectObservable(events$).toBe(`---a- ${delayValue}ms -b`, {
+        a: {
+          type: 'FailedTryingAgain',
+          req,
+          err,
+          attempt: 1,
+        },
+
+        b: {
           type: 'Succeeded',
           req,
           res: response,
@@ -211,6 +226,8 @@ describe('retryRequestWithStrategy', () => {
     ).thenReturn(delayValue2);
 
     testScheduler.run(({ cold, expectObservable, expectSubscriptions }) => {
+      const events$ = new ReplaySubject<RetryInterceptorEvent>(100);
+
       const failure1$ = cold(
         '-s-#',
         {
@@ -244,7 +261,8 @@ describe('retryRequestWithStrategy', () => {
           maxRetryAttempts: faker.helpers.maybe(() => faker.number.int()),
           maxTotalDelay: faker.helpers.maybe(() => faker.number.int()),
         },
-        new Subject<RetryInterceptorEvent>()
+        state,
+        events$
       );
 
       expectObservable(result$).toBe(
@@ -260,6 +278,30 @@ describe('retryRequestWithStrategy', () => {
       );
       expectSubscriptions(success$.subscriptions).toBe(
         `${delayValue1}ms --- ${delayValue2}ms ---^---!`
+      );
+
+      expectObservable(events$).toBe(
+        `---a- ${delayValue1}ms -b- ${delayValue2}ms -c`,
+        {
+          a: {
+            type: 'FailedTryingAgain',
+            req,
+            err,
+            attempt: 1,
+          },
+          b: {
+            type: 'FailedTryingAgain',
+            req,
+            err,
+            attempt: 2,
+          },
+          c: {
+            type: 'Succeeded',
+            req,
+            res: response,
+            attempt: 3,
+          },
+        }
       );
     });
   });
@@ -314,6 +356,7 @@ describe('retryRequestWithStrategy', () => {
           maxRetryAttempts: 2,
           maxTotalDelay: faker.helpers.maybe(() => faker.number.int()),
         },
+        state,
         new Subject<RetryInterceptorEvent>()
       );
 

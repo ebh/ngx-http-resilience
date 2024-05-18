@@ -6,23 +6,28 @@ import {
 } from '@angular/common/http';
 import { Observable, Subject, catchError, switchMap, tap, timer } from 'rxjs';
 import { RetryInterceptorEvent, RetryPolicy } from '../types';
-import { createRetryState, getUpdatedRetryState } from './retry-state';
+import { getUpdatedRetryState } from './retry-state';
 import { RetryState } from './types';
 
 export function retryRequestWithStrategy(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
   strategy: RetryPolicy,
+  state: RetryState,
   events$: Subject<RetryInterceptorEvent>
 ): Observable<HttpEvent<unknown>> {
-  let state = createRetryState();
-
   function retry(
     sourceFn: () => Observable<HttpEvent<unknown>>
   ): Observable<HttpEvent<unknown>> {
     return sourceFn().pipe(
       catchError((err: unknown) => {
         if (!strategy.shouldHandleError(err)) {
+          events$.next({
+            type: 'UnhandledError',
+            req,
+            err,
+            attempt: state.attempt + 1,
+          });
           throw err;
         }
 
@@ -35,25 +40,29 @@ export function retryRequestWithStrategy(
           events$.next({
             type: 'FailedMaxAttemptsExceeded',
             req,
-            error: err,
-            attempt: state.attempt,
+            err,
+            attempt: state.attempt + 1,
           });
           throw err;
+        } else {
+          events$.next({
+            type: 'FailedTryingAgain',
+            req,
+            err,
+            attempt: state.attempt,
+          });
         }
 
         return timer(strategy.delay(state)).pipe(
           switchMap(() => retry(sourceFn))
         );
-      }),
-      tap((httpEvent) => sendSuccessEvents(req, httpEvent, state, events$)),
-      catchError((err: unknown) => {
-        sendFailedEvents(req, err, state, events$);
-        throw err;
       })
     );
   }
 
-  return retry(() => next(req));
+  return retry(() => next(req)).pipe(
+    tap((httpEvent) => sendSuccessEvents(req, httpEvent, state, events$))
+  );
 }
 
 function sendSuccessEvents(
@@ -70,20 +79,4 @@ function sendSuccessEvents(
       attempt: state.attempt + 1,
     });
   }
-}
-
-function sendFailedEvents(
-  req: HttpRequest<unknown>,
-  err: unknown,
-  state: RetryState,
-  events$: Subject<RetryInterceptorEvent>
-) {
-  // TODO: Don't emit when maxRetryAttempts is exceeded
-
-  events$.next({
-    type: 'FailedTryingAgain',
-    req,
-    error: err,
-    attempt: state.attempt + 1,
-  });
 }
