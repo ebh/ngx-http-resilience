@@ -27,6 +27,7 @@ export function retryRequestWithStrategy(
             req,
             err,
             attempt: state.attempt + 1,
+            totalTime: Date.now() - state.startTime,
           });
           throw err;
         }
@@ -42,6 +43,7 @@ export function retryRequestWithStrategy(
             req,
             err,
             attempt: state.attempt + 1,
+            totalTime: Date.now() - state.startTime,
           });
           throw err;
         } else {
@@ -50,6 +52,7 @@ export function retryRequestWithStrategy(
             req,
             err,
             attempt: state.attempt,
+            totalTime: Date.now() - state.startTime,
           });
         }
 
@@ -77,6 +80,7 @@ function sendSuccessEvents(
       req,
       res: event,
       attempt: state.attempt + 1,
+      totalTime: Date.now() - state.startTime,
     });
   }
 }

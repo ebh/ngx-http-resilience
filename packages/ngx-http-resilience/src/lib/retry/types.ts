@@ -47,7 +47,12 @@ interface ErrorEvent {
 }
 
 interface MetricEvent {
+  /** The number of the current attempt
+   * 1st attempt is 1, 2nd attempt is 2, etc.
+   */
   attempt: number;
+  /** The time in milliseconds since the request was received */
+  totalTime: number;
 }
 
 export type RetryInterceptorRequestIgnoredEvent = BaseEvent<'RequestIgnored'>;

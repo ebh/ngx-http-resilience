@@ -57,6 +57,7 @@ export function createHttpRetryInterceptorFn(
                   type: 'MaxDelayExceeded',
                   req,
                   attempt: state.attempt + 1,
+                  totalTime: Date.now() - state.startTime,
                 });
 
                 return new Error('Max total delay exceeded');

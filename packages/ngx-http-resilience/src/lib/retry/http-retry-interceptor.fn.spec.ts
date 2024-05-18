@@ -296,7 +296,13 @@ describe('createHttpRetryInterceptorFn', () => {
         expectObservable(result$).toBe('-s-#', { s: sentEvent }, err);
 
         expectObservable(events$).toBe('---e', {
-          e: { req, type: 'UnhandledError', err, attempt: 1 },
+          e: {
+            req,
+            type: 'UnhandledError',
+            err,
+            attempt: 1,
+            totalTime: expect.any(Number),
+          },
         });
       });
     });
@@ -349,7 +355,12 @@ describe('createHttpRetryInterceptorFn', () => {
         );
 
         expectObservable(events$).toBe(`${maxTotalDelay}ms -e`, {
-          e: { req, type: 'MaxDelayExceeded', attempt: 1 },
+          e: {
+            req,
+            type: 'MaxDelayExceeded',
+            attempt: 1,
+            totalTime: expect.any(Number),
+          },
         });
       });
     });

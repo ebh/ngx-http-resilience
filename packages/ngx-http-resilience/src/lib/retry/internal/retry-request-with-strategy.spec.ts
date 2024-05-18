@@ -94,7 +94,13 @@ describe('retryRequestWithStrategy', () => {
       });
       expectSubscriptions(source$.subscriptions).toBe(sub);
       expectObservable(events$).toBe('---e', {
-        e: { type: 'Succeeded', req, res: response, attempt: 1 },
+        e: {
+          type: 'Succeeded',
+          req,
+          res: response,
+          attempt: 1,
+          totalTime: expect.any(Number),
+        },
       });
     });
   });
@@ -140,7 +146,13 @@ describe('retryRequestWithStrategy', () => {
       );
       expectSubscriptions(source$.subscriptions).toBe(sub);
       expectObservable(events$).toBe('---(e)', {
-        e: { type: 'UnhandledError', req, err, attempt: 1 },
+        e: {
+          type: 'UnhandledError',
+          req,
+          err,
+          attempt: 1,
+          totalTime: expect.any(Number),
+        },
       });
     });
   });
@@ -200,6 +212,7 @@ describe('retryRequestWithStrategy', () => {
           req,
           err,
           attempt: 1,
+          totalTime: expect.any(Number),
         },
 
         b: {
@@ -207,6 +220,7 @@ describe('retryRequestWithStrategy', () => {
           req,
           res: response,
           attempt: 2,
+          totalTime: expect.any(Number),
         },
       });
     });
@@ -288,18 +302,21 @@ describe('retryRequestWithStrategy', () => {
             req,
             err,
             attempt: 1,
+            totalTime: expect.any(Number),
           },
           b: {
             type: 'FailedTryingAgain',
             req,
             err,
             attempt: 2,
+            totalTime: expect.any(Number),
           },
           c: {
             type: 'Succeeded',
             req,
             res: response,
             attempt: 3,
+            totalTime: expect.any(Number),
           },
         }
       );
