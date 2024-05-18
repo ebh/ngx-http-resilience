@@ -37,49 +37,37 @@ export const RetryInterceptorRequestTypes = {
   Succeeded: 'Succeeded',
 } as const satisfies { [key in RetryInterceptorRequestType]: key };
 
-interface BaseRetryInterceptorRequest {
+interface BaseEvent<T extends RetryInterceptorRequestType> {
   req: HttpRequest<unknown>;
-  type: RetryInterceptorRequestType;
+  type: T;
 }
 
-export interface RetryInterceptorRequestIgnoredEvent
-  extends BaseRetryInterceptorRequest {
-  type: 'RequestIgnored';
-}
-
-export interface RetryInterceptorUnhandledErrorEvent
-  extends BaseRetryInterceptorRequest {
-  type: 'UnhandledError';
+interface ErrorEvent {
   err: unknown;
+}
+
+interface MetricEvent {
   attempt: number;
 }
 
-export interface RetryInterceptorRequestFailedTryingAgainEvent
-  extends BaseRetryInterceptorRequest {
-  type: 'FailedTryingAgain';
-  err: unknown;
-  attempt: number;
-}
+export type RetryInterceptorRequestIgnoredEvent = BaseEvent<'RequestIgnored'>;
 
-export interface RetryInterceptorRequestFailedMaxAttemptsExceededEvent
-  extends BaseRetryInterceptorRequest {
-  type: 'FailedMaxAttemptsExceeded';
-  err: unknown;
-  attempt: number;
-}
+export type RetryInterceptorUnhandledErrorEvent = BaseEvent<'UnhandledError'> &
+  ErrorEvent &
+  MetricEvent;
 
-export interface RetryInterceptorRequestMaxDelayExceededEvent
-  extends BaseRetryInterceptorRequest {
-  type: 'MaxDelayExceeded';
-  attempt: number;
-}
+export type RetryInterceptorRequestFailedTryingAgainEvent =
+  BaseEvent<'FailedTryingAgain'> & ErrorEvent & MetricEvent;
 
-export interface RetryInterceptorRequestSucceededEvent
-  extends BaseRetryInterceptorRequest {
-  type: 'Succeeded';
+export type RetryInterceptorRequestFailedMaxAttemptsExceededEvent =
+  BaseEvent<'FailedMaxAttemptsExceeded'> & ErrorEvent & MetricEvent;
+
+export type RetryInterceptorRequestMaxDelayExceededEvent =
+  BaseEvent<'MaxDelayExceeded'> & MetricEvent;
+
+export type RetryInterceptorRequestSucceededEvent = BaseEvent<'Succeeded'> & {
   res: unknown;
-  attempt: number;
-}
+} & MetricEvent;
 
 export type RetryInterceptorEvent =
   | RetryInterceptorRequestIgnoredEvent
