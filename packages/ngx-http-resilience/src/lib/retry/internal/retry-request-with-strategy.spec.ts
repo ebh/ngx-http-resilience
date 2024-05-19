@@ -7,7 +7,7 @@ import {
   HttpSentEvent,
 } from '@angular/common/http';
 import { faker } from '@faker-js/faker';
-import { ReplaySubject, Subject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import { TestScheduler } from 'rxjs/testing';
 import * as td from 'testdouble';
 import {
@@ -337,6 +337,8 @@ describe('retryRequestWithStrategy', () => {
     ).thenReturn(delayValue2);
 
     testScheduler.run(({ cold, expectObservable, expectSubscriptions }) => {
+      const events$ = new ReplaySubject<RetryInterceptorEvent>(100);
+
       const failure1$ = cold(
         '-s-#',
         {
@@ -374,7 +376,7 @@ describe('retryRequestWithStrategy', () => {
           maxTotalDelay: faker.helpers.maybe(() => faker.number.int()),
         },
         state,
-        new Subject<RetryInterceptorEvent>()
+        events$
       );
 
       expectObservable(result$).toBe(
@@ -390,6 +392,33 @@ describe('retryRequestWithStrategy', () => {
       );
       expectSubscriptions(failure3$.subscriptions).toBe(
         `${delayValue1}ms -- ${delayValue2}ms ----^--!`
+      );
+
+      expectObservable(events$).toBe(
+        `---a- ${delayValue1}ms -b- ${delayValue2}ms -c`,
+        {
+          a: {
+            type: 'FailedTryingAgain',
+            req,
+            err,
+            attempt: 1,
+            totalTime: expect.any(Number),
+          },
+          b: {
+            type: 'FailedTryingAgain',
+            req,
+            err,
+            attempt: 2,
+            totalTime: expect.any(Number),
+          },
+          c: {
+            type: 'FailedMaxAttemptsExceeded',
+            req,
+            err,
+            attempt: 3,
+            totalTime: expect.any(Number),
+          },
+        }
       );
     });
   });
