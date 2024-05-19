@@ -42,7 +42,7 @@ export function retryRequestWithStrategy(
             type: 'FailedMaxAttemptsExceeded',
             req,
             err,
-            attempt: state.attempt + 1,
+            attempt: state.attempt,
             totalTime: Date.now() - state.startTime,
           });
           throw err;
