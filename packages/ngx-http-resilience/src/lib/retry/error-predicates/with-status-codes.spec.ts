@@ -1,5 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { withStatusCodes } from './with-status-codes';
+import {
+  STANDARD_RETRYABLE_STATUS_CODES,
+  withStatusCodes,
+} from './with-status-codes';
 
 const plainError = new Error('some error');
 const httpErrorWithStatus400 = new HttpErrorResponse({ status: 400 });
@@ -50,4 +53,10 @@ describe('withStatusCodes', () => {
       expect(predicate(error)).toBe(expected);
     }
   );
+
+  it('should be callable with STANDARD_RETRYABLE_STATUS_CODES', () => {
+    const predicate = withStatusCodes(STANDARD_RETRYABLE_STATUS_CODES);
+
+    expect(predicate(httpErrorWithStatus500)).toBe(false);
+  });
 });
