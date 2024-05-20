@@ -14,7 +14,7 @@ describe('createRetryState', () => {
 });
 
 describe('getUpdatedRetryState', () => {
-  it('should increment the attemps only', () => {
+  it('should increment the attempts only', () => {
     const state = createRetryState();
 
     expect(getUpdatedRetryState(state)).toEqual({
