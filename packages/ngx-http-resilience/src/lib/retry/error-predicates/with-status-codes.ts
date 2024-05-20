@@ -49,6 +49,7 @@ export const STANDARD_RETRYABLE_STATUS_CODES = [
  *  createHttpRetryInterceptorFn({
  *    ...
  *    shouldHandleError: withStatusCodes(500),
+ * })
  *
  * @example
  *  createHttpRetryInterceptorFn({
