@@ -59,7 +59,8 @@ interface MetricEvent {
 
 export type RetryInterceptorRequestIgnoredEvent = BaseEvent<'RequestIgnored'>;
 
-export type RetryInterceptorIgnoredRequestFailed = BaseEvent<'IgnoredRequestFailed'> & ErrorEvent;
+export type RetryInterceptorIgnoredRequestFailed =
+  BaseEvent<'IgnoredRequestFailed'> & ErrorEvent;
 
 export type RetryInterceptorUnhandledErrorEvent = BaseEvent<'UnhandledError'> &
   ErrorEvent &

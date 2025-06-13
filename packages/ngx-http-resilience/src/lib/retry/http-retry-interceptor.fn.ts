@@ -30,15 +30,15 @@ export function createHttpRetryInterceptorFn(
 
   return (req, next) => {
     if (!policy.shouldHandleRequest(req)) {
+      options.events$?.next({ type: 'RequestIgnored', req });
 
-        options.events$?.next({ type: 'RequestIgnored', req });
+      return next(req).pipe(
+        catchError((err: unknown) => {
+          options.events$?.next({ type: 'IgnoredRequestFailed', req, err });
 
-
-      return next(req).pipe(catchError((err: unknown) => {
-        options.events$?.next({ type: 'IgnoredRequestFailed', req, err });
-
-        return throwError(() => err)
-      }));
+          return throwError(() => err);
+        })
+      );
     }
 
     const state = createRetryState();
