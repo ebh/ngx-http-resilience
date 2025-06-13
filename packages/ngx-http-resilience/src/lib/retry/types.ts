@@ -23,6 +23,7 @@ export interface RetryPolicy {
 
 export type RetryInterceptorRequestType =
   | 'RequestIgnored'
+  | 'IgnoredRequestFailed'
   | 'UnhandledError'
   | 'FailedTryingAgain'
   | 'FailedMaxAttemptsExceeded'
@@ -30,6 +31,7 @@ export type RetryInterceptorRequestType =
   | 'Succeeded';
 export const RetryInterceptorRequestTypes = {
   RequestIgnored: 'RequestIgnored',
+  IgnoredRequestFailed: 'IgnoredRequestFailed',
   UnhandledError: 'UnhandledError',
   FailedTryingAgain: 'FailedTryingAgain',
   FailedMaxAttemptsExceeded: 'FailedMaxAttemptsExceeded',
@@ -57,6 +59,8 @@ interface MetricEvent {
 
 export type RetryInterceptorRequestIgnoredEvent = BaseEvent<'RequestIgnored'>;
 
+export type RetryInterceptorIgnoredRequestFailed = BaseEvent<'IgnoredRequestFailed'> & ErrorEvent;
+
 export type RetryInterceptorUnhandledErrorEvent = BaseEvent<'UnhandledError'> &
   ErrorEvent &
   MetricEvent;
@@ -76,6 +80,7 @@ export type RetryInterceptorRequestSucceededEvent = BaseEvent<'Succeeded'> & {
 
 export type RetryInterceptorEvent =
   | RetryInterceptorRequestIgnoredEvent
+  | RetryInterceptorIgnoredRequestFailed
   | RetryInterceptorUnhandledErrorEvent
   | RetryInterceptorRequestFailedTryingAgainEvent
   | RetryInterceptorRequestFailedMaxAttemptsExceededEvent

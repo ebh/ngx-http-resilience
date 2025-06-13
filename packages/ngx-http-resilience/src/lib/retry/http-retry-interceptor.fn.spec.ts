@@ -268,6 +268,39 @@ describe('createHttpRetryInterceptorFn', () => {
       });
     });
 
+    it('should emit RetryInterceptorIgnoredRequestFailed when shouldHandleRequest returns false and error occurs', () => {
+      testScheduler.run(({ cold, expectObservable }) => {
+        const failedSource$: Observable<HttpEvent<unknown>> = cold(
+          '-s-#',
+          { s: sentEvent },
+          err
+        );
+
+        td.when(shouldHandleRequest(req)).thenReturn(false);
+        td.when(next(req)).thenReturn(failedSource$);
+
+        const events$ = new ReplaySubject<RetryInterceptorEvent>(100);
+
+        interceptorFn = createHttpRetryInterceptorFn(
+          {
+            shouldHandleRequest,
+            shouldHandleError,
+            delay,
+          },
+          { events$ }
+        );
+
+        const result$ = interceptorFn(req, next);
+
+        expectObservable(result$).toBe('-s-#', { s: sentEvent }, err);
+
+        expectObservable(events$).toBe('a--b', {
+          a: { type: 'RequestIgnored', req },
+          b: { type: 'IgnoredRequestFailed', req, err },
+        });
+      });
+    });
+
     it('should emit error when shouldHandleError returns false', () => {
       testScheduler.run(({ cold, expectObservable }) => {
         const failedSource$: Observable<HttpEvent<unknown>> = cold(

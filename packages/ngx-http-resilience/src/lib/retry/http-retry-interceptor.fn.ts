@@ -1,5 +1,5 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { Subject, throwError, timeout } from 'rxjs';
+import { catchError, Subject, throwError, timeout } from 'rxjs';
 import { createRetryState, retryRequestWithStrategy } from './internal';
 import {
   RetryInterceptorEvent,
@@ -30,11 +30,15 @@ export function createHttpRetryInterceptorFn(
 
   return (req, next) => {
     if (!policy.shouldHandleRequest(req)) {
-      if (options.events$) {
-        options.events$.next({ type: 'RequestIgnored', req });
-      }
 
-      return next(req);
+        options.events$?.next({ type: 'RequestIgnored', req });
+
+
+      return next(req).pipe(catchError((err: unknown) => {
+        options.events$?.next({ type: 'IgnoredRequestFailed', req, err });
+
+        return throwError(() => err)
+      }));
     }
 
     const state = createRetryState();
